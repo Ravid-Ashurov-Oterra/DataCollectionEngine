@@ -115,11 +115,34 @@ food_tags = {
 }
 
 built_heights_tags = {
-      "building": True,
-      "man_made": ["works", "building", "storage_tank", "tower", "wastewater_plant", "chimney"],
-      "amenity": ["industrial", "college", "school", "hospital", "kindergarten", "university", "library", "place_of_worship", "clinic"],
-      "office": True,
-      "shop": True,
-      "craft": True,
-      "power": ["plant", "substation"]
-  }
+    "building": True,
+    "man_made": ["works", "building", "storage_tank", "tower", "wastewater_plant", "chimney"],
+    "amenity": ["industrial", "college", "school", "hospital", "kindergarten", "university", "library", "place_of_worship", "clinic"],
+    "office": True,
+    "shop": True,
+    "craft": True,
+    "power": ["plant", "substation"]
+}
+
+government_tags = {
+    "amenity": [
+        "townhall",
+        "courthouse",
+        "police",
+        "fire_station",
+        "prison",
+        "embassy"
+    ],
+    "office": [
+        "government",
+        "administrative",
+        "diplomatic"
+    ],
+    "building": [
+        "government"
+    ],
+    "military": True,             # e.g. bases, barracks
+    "landuse": ["military"],
+    "border_control": True,
+    "customs": True
+}

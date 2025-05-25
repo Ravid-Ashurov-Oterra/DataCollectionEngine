@@ -1,10 +1,10 @@
 import osmnx as ox
 from shapely.geometry import Polygon
-from arabic_buckwalter_transliteration.transliteration import arabic_to_buckwalter
 from shapely.ops import unary_union
 from shapely.prepared import prep
 from h3.api.basic_str import cell_to_boundary
 import re
+from translation_utils import transliterate_arabic_name
 
 # --- Helpers ---
 def is_arabic(text):
@@ -13,7 +13,7 @@ def is_arabic(text):
 def transliterate_name(name):
     if not isinstance(name, str):
         return None
-    return arabic_to_buckwalter(name) if is_arabic(name) else name
+    return transliterate_arabic_name(name) if is_arabic(name) else name
 
 def process_osm_names_and_assign_to_tiles(polygon, tile_ids, tiles_map):
     """
@@ -65,9 +65,27 @@ def process_osm_names_and_assign_to_tiles(polygon, tile_ids, tiles_map):
                     if feature.geometry.intersects(h3_polygon):
                         name = feature.get("name")
                         if name:
-                            tiles_map[h3_id]["tile_name"] = name
+                            if tiles_map[h3_id]["tile_name"]:
+                                tiles_map[h3_id]["tile_name"] += " / " + name
+                            else:
+                                tiles_map[h3_id]["tile_name"] = name
                             tiles_map[h3_id]["tile_name_translit"] = transliterate_name(name)
                             break  # Assign the first matching name and stop
+            else:
+                # If no intersection, find the closest named feature
+                closest_feature = None
+                closest_distance = float('inf')
+                for idx, feature in geo_data_frames.iterrows():
+                    distance = h3_polygon.distance(feature.geometry)
+                    if distance < closest_distance:
+                        closest_distance = distance
+                        closest_feature = feature
+
+                if closest_feature is not None:
+                    name = closest_feature.get("name")
+                    if name:
+                        tiles_map[h3_id]["tile_name"] = name
+                        tiles_map[h3_id]["tile_name_translit"] = transliterate_name(name)
 
     except Exception as e:
         print(f"Error processing OSM names: {e}")

@@ -72,7 +72,8 @@ tif_paths_with_functions = {
 }
 process_tile_heights(tif_paths_with_functions, tile_ids, tiles_map, SOFTENING_STRENGTH)
 tags_and_dynamics = [
-    [food_tags, "FOOD"]
+    [food_tags, "FOOD"],
+    [government_tags, 'GOV']
 ]
 process_tags_and_append_dynamics(tags_and_dynamics, polygon, tile_ids, tiles_map)
 process_building_heights_and_assign_width(polygon, tile_ids, tiles_map)
