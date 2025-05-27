@@ -62,18 +62,19 @@ tags_and_functions = [
     [parks_tags, 'park'],
     [schools_tags, 'school'],
     [religion_tags, 'religious'],
-    [amenities_tags, 'amenity'],
-    [water_tags, 'water'],
+    # [amenities_tags, 'amenity'],
+    # [water_tags, 'water'],
+    [government_tags, 'gov']
 ]
 process_multiple_tags(tags_and_functions, polygon, tile_ids, tiles_map)
 process_roads_and_assign_width(polygon, tile_ids, tiles_map, roads_tags)
 tif_paths_with_functions = {
-    "../Assets/dtm_clip.tif": ["na", "road", "veg", "park", "built", "school", "religious", "amenity", "water", "food"],
+    # "../Assets/dsm_clip.tif": ["na", "road", "veg", "park", "built", "school", "religious", "amenity", "water", "food", "gov"], #RES15
+    "../Assets/dtm_clip.tif": ["na", "road", "veg", "park", "built", "school", "religious", "amenity", "water", "food", "gov"], #RES12
 }
 process_tile_heights(tif_paths_with_functions, tile_ids, tiles_map, SOFTENING_STRENGTH)
 tags_and_dynamics = [
     [food_tags, "FOOD"],
-    [government_tags, 'GOV']
 ]
 process_tags_and_append_dynamics(tags_and_dynamics, polygon, tile_ids, tiles_map)
 process_building_heights_and_assign_width(polygon, tile_ids, tiles_map)

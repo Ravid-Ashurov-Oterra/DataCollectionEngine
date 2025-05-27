@@ -5,6 +5,7 @@ from shapely.prepared import prep
 from h3.api.basic_str import cell_to_boundary
 import math
 from inputs.config import *
+from inputs.osm_tags import *
 
 def process_building_heights_and_assign_width(polygon, tile_ids, tiles_map):
     """
@@ -18,20 +19,11 @@ def process_building_heights_and_assign_width(polygon, tile_ids, tiles_map):
     Returns:
         None: Updates the `tile_dimensions` in `tiles_map` in place.
     """
-    tags = {
-        "building": True,
-        "man_made": ["works", "building", "storage_tank", "tower", "wastewater_plant", "chimney"],
-        "amenity": ["industrial", "college", "school", "hospital", "kindergarten", "university", "library", "place_of_worship", "clinic"],
-        "office": True,
-        "shop": True,
-        "craft": True,
-        "power": ["plant", "substation"]
-    }
 
     print("Fetching building data...")
     try:
         # Query OSM for building features
-        geo_data_frames = ox.features_from_polygon(polygon, tags)
+        geo_data_frames = ox.features_from_polygon(polygon, tags=built_heights_tags)
         features = list(geo_data_frames.geometry)
 
         # Extract height and levels attributes
@@ -65,7 +57,8 @@ def process_building_heights_and_assign_width(polygon, tile_ids, tiles_map):
                             elif levels is not None and not math.isnan(float(levels)):
                                 building_height = float(levels) * DEFAULT_LEVEL_HEIGHT_M
                     except Exception as e:
-                        print(f"Error processing building feature {idx}: {e}, skipping.")
+                        print(f"Error processing building feature {idx}: {e}, assigning default height.")
+                        building_height = float(levels) * DEFAULT_LEVEL_HEIGHT_M
 
                 # Assign the maximum height to tile_dimensions
                 tiles_map[h3_id]["tile_dimensions"] = building_height

@@ -17,12 +17,13 @@ def merge_h3_csv_files(file1, file2, output_file):
     function_weights = {
         'water': 1,
         'amenity': 2,
-        'religious': 3,
-        'school': 4,
-        'veg': 5,
-        'park': 6,
-        'built': 7,
-        'road': 8
+        'veg': 3,
+        'park': 4,
+        'built': 5,
+        'religious': 6,
+        'school': 7,
+        'gov': 8,
+        'road': 9
     }
 
     # Merge the two DataFrames on the 'tile_h3_id' column
@@ -85,7 +86,7 @@ def merge_h3_csv_files(file1, file2, output_file):
     print(f"Merged file saved to {output_file}")
 
 
-file1 = '../data/mergeAssets/tiles_map_20250520_091358.csv' 
-file2 = '../data/mergeAssets/NablusTileTable-20_05.csv'  
-output_file = '../data/mergeAssets/merged_tiles.csv' 
+file1 = '../../Outputs/CSVs/tiles_map_20250526_222224.csv'
+file2 = '../../Outputs/MergedTable/NablusTileTable.csv' 
+output_file = '../../Outputs/MergedTable/merged_tile_tables.csv' 
 merge_h3_csv_files(file1, file2, output_file)
