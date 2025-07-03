@@ -52,11 +52,11 @@ tiles_map = {tile_id: {
     'neighbors': [neighbor for neighbor in grid_ring(tile_id, 1) if neighbor != tile_id],
     'tile_function': 'na',  
     'height': None, 
-    'score1': 0, 
+    'score1': random.choices([0.1, 0.5, 1], weights=[0.99, 0.005, 0.005])[0] if SKIP_HEIGHTS else 0, 
     'score2': random.choices([0.1, 0.5, 1], weights=[0.99, 0.005, 0.005])[0], 
     'dynamics': [],  
     'function_dimensions': 0.0, 
-    'hard_height': 0,
+    **({} if SKIP_HEIGHTS else {'hard_height': 0}),
     'name1': '',
     'name2': '',
 } for tile_id in tile_ids}
@@ -81,14 +81,17 @@ tif_paths_with_functions = {
     # "../Assets/dsm_clip.tif": ["na", "road", "veg", "park", "built", "school", "religious", "amenity", "water", "food", "gov"], #RES15
     "../Assets/dtm_clip.tif": ["na", "road", "veg", "park", "built", "school", "religious", "amenity", "water", "food", "gov"], #RES12
 }
-process_tile_heights(tif_paths_with_functions, tile_ids, tiles_map, SOFTENING_STRENGTH)
 tags_and_dynamics = [
     [food_tags, "FOOD"],
 ]
 process_tags_and_append_dynamics(tags_and_dynamics, polygon, tile_ids, tiles_map)
 process_building_heights_and_assign_width(polygon, tile_ids, tiles_map)
-calculate_gradient_scores(tiles_map, tile_ids)
-mark_flood_risk_tiles(tiles_map, tile_ids)
+
+if not SKIP_HEIGHTS:
+    process_tile_heights(tif_paths_with_functions, tile_ids, tiles_map, SOFTENING_STRENGTH)
+    calculate_gradient_scores(tiles_map, tile_ids)
+    mark_flood_risk_tiles(tiles_map, tile_ids)
+    
 process_osm_names_and_assign_to_tiles(polygon, tile_ids, tiles_map)
 
 export_tiles_map_to_csv(tiles_map)

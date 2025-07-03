@@ -30,22 +30,22 @@ CENTER = {
 # }
 
 
-# # Tel Aviv
-# BOUNDING_BOX = {
-#     # 'lat': 52.5200,
-#     # 'lng': 13.4050
-#     'north': 32.0853,
-#     'south': 32.0753,
-#     'west': 34.7918,
-#     'east': 34.7718
-# }
-# Origin BBox  
+# Tel Aviv
 BOUNDING_BOX = {
-    'north': 32.2311823,
-    'south': 32.2116428,
-    'west': 35.2730451,
-    'east': 35.3050055
+    # 'lat': 52.5200,
+    # 'lng': 13.4050
+    'north': 32.0853,
+    'south': 32.0753,
+    'west': 34.7918,
+    'east': 34.7718
 }
+# # Origin BBox  
+# BOUNDING_BOX = {
+#     'north': 32.2311823,
+#     'south': 32.2116428,
+#     'west': 35.2730451,
+#     'east': 35.3050055
+# }
 
 ZOOM_TOP_LEFT = {
     # open area with slopes
@@ -101,3 +101,6 @@ ZOOM_IN_BBOX = BOUNDING_BOX
 #     "east": 35.28569342138099,
 #     "west": 35.28479551136178
 # }
+
+
+SKIP_HEIGHTS=True
