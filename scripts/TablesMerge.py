@@ -26,17 +26,17 @@ def merge_h3_csv_files(file1, file2, output_file):
         'road': 9
     }
 
-    # Merge the two DataFrames on the 'tile_h3_id' column
-    merged = pd.merge(df1, df2, on='tile_h3_id', how='outer', suffixes=('_file1', '_file2'))
+    # Merge the two DataFrames on the 'id' column
+    merged = pd.merge(df1, df2, on='id', how='outer', suffixes=('_file1', '_file2'))
 
     # Apply the merging logic
-    merged['tile_center'] = merged['tile_center_file1']  # Always take from the first file
-    merged['tile_neighbors'] = merged['tile_neighbors_file1']  # Always take from the first file
-    merged['tile_dimensions'] = merged[['tile_dimensions_file1', 'tile_dimensions_file2']].max(axis=1)  # Take max value
-    merged['tile_height'] = merged['tile_height_file1'].combine_first(merged['tile_height_file2'])  # Prefer first file
-    merged['tile_grad_score'] = merged['tile_grad_score_file1'].combine_first(merged['tile_grad_score_file2'])  # Prefer first file
+    merged['center'] = merged['tile_center_file1']  # Always take from the first file
+    merged['neighbors'] = merged['tile_neighbors_file1']  # Always take from the first file
+    merged['function_dimensions'] = merged[['tile_dimensions_file1', 'tile_dimensions_file2']].max(axis=1)  # Take max value
+    merged['height'] = merged['tile_height_file1'].combine_first(merged['tile_height_file2'])  # Prefer first file
+    merged['score1'] = merged['tile_grad_score_file1'].combine_first(merged['tile_grad_score_file2'])  # Prefer first file
 
-    # Merge 'tile_dynamics' by combining distinct values from both files
+    # Merge 'dynamics' by combining distinct values from both files
     def merge_tile_dynamics(row):
       dynamics1 = row['tile_dynamics_file1']
       dynamics2 = row['tile_dynamics_file2']
@@ -49,7 +49,7 @@ def merge_h3_csv_files(file1, file2, output_file):
       merged_dynamics = str(sorted(set1.union(set2)))
       return merged_dynamics
 
-    merged['tile_dynamics'] = merged.apply(merge_tile_dynamics, axis=1)
+    merged['dynamics'] = merged.apply(merge_tile_dynamics, axis=1)
 
     # Resolve 'tile_function' based on weights
     def resolve_function(row):
@@ -77,8 +77,8 @@ def merge_h3_csv_files(file1, file2, output_file):
     merged['tile_function'] = merged.apply(resolve_function, axis=1)
 
     # Select the final columns to save
-    final_columns = ['tile_h3_id', 'tile_center', 'tile_neighbors', 'tile_height', 
-                    'tile_grad_score', 'tile_function', 'tile_dynamics', 'tile_dimensions', 'tile_name', 'tile_name_translit']
+    final_columns = ['id', 'center', 'neighbors', 'height', 
+                    'score1', 'tile_function', 'dynamics', 'function_dimensions', 'name1', 'name2']
     merged = merged[final_columns]
 
     # Save the merged DataFrame to a new CSV file

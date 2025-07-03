@@ -3,10 +3,11 @@ from shapely.geometry import Polygon
 from shapely.ops import unary_union
 from shapely.prepared import prep
 from h3.api.basic_str import cell_to_boundary
+import time
 
 def process_tags_and_append_dynamics(tags_and_dynamics, polygon, tile_ids, tiles_map):
     """
-    Process multiple tags and append values to the tile_dynamics field for tiles that intersect with the features.
+    Process multiple tags and append values to the dynamics field for tiles that intersect with the features.
 
     Args:
         tags_and_dynamics (list): A list of [tags_dict, dynamic_value] pairs.
@@ -15,7 +16,7 @@ def process_tags_and_append_dynamics(tags_and_dynamics, polygon, tile_ids, tiles
         tiles_map (dict): The dictionary mapping H3 tile IDs to their properties.
 
     Returns:
-        None: Updates the `tile_dynamics` in `tiles_map` in place.
+        None: Updates the `dynamics` in `tiles_map` in place.
     """
     # Prepare a dictionary to store prepared geometries for each dynamic value
     prepped_features = {}
@@ -44,7 +45,7 @@ def process_tags_and_append_dynamics(tags_and_dynamics, polygon, tile_ids, tiles
         # Check intersections for all dynamic values
         for dynamic_value, features_prep in prepped_features.items():
             if features_prep.intersects(h3_polygon):
-                tiles_map[h3_id]['tile_dynamics'].append(dynamic_value)
+                tiles_map[h3_id]['dynamics'].append({'type': dynamic_value, 'timestamp': time.time()})
 
 def mark_flood_risk_tiles(tiles_map, tile_ids, flood_risk_percentage=0.02):
     """
@@ -56,12 +57,12 @@ def mark_flood_risk_tiles(tiles_map, tile_ids, flood_risk_percentage=0.02):
         flood_risk_percentage (float): The percentage of tiles to mark as flood risk.
 
     Returns:
-        None: Updates the `tile_dynamics` in `tiles_map` in place.
+        None: Updates the `dynamics` in `tiles_map` in place.
     """
     # Sort tiles by height
-    sorted_tiles = sorted(tile_ids, key=lambda x: tiles_map[x]['tile_height'])
+    sorted_tiles = sorted(tile_ids, key=lambda x: tiles_map[x]['height'])
     num_flood_risk_tiles = int(len(sorted_tiles) * flood_risk_percentage)
 
     for i in range(num_flood_risk_tiles):
         h3_id = sorted_tiles[i]
-        tiles_map[h3_id]['tile_dynamics'].append("FLOODED")
+        tiles_map[h3_id]['dynamics'].append({'type': "FLOODED", 'timestamp': time.time()})

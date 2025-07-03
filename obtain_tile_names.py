@@ -25,7 +25,7 @@ def process_osm_names_and_assign_to_tiles(polygon, tile_ids, tiles_map):
         tiles_map (dict): The dictionary mapping H3 tile IDs to their properties.
 
     Returns:
-        None: Updates the `tile_name` and `tile_name_translit` fields in `tiles_map` in place.
+        None: Updates the `name1` and `name2` fields in `tiles_map` in place.
     """
     # Tags to query OSM for named features
     name_tags = {
@@ -65,11 +65,11 @@ def process_osm_names_and_assign_to_tiles(polygon, tile_ids, tiles_map):
                     if feature.geometry.intersects(h3_polygon):
                         name = feature.get("name")
                         if name:
-                            if tiles_map[h3_id]["tile_name"]:
-                                tiles_map[h3_id]["tile_name"] += " / " + name
+                            if tiles_map[h3_id]["name1"]:
+                                tiles_map[h3_id]["name1"] += " / " + name
                             else:
-                                tiles_map[h3_id]["tile_name"] = name
-                            tiles_map[h3_id]["tile_name_translit"] = transliterate_name(name)
+                                tiles_map[h3_id]["name1"] = name
+                            tiles_map[h3_id]["name2"] = transliterate_name(name)
                             break  # Assign the first matching name and stop
             else:
                 # If no intersection, find the closest named feature
@@ -84,8 +84,9 @@ def process_osm_names_and_assign_to_tiles(polygon, tile_ids, tiles_map):
                 if closest_feature is not None:
                     name = closest_feature.get("name")
                     if name:
-                        tiles_map[h3_id]["tile_name"] = name
-                        tiles_map[h3_id]["tile_name_translit"] = transliterate_name(name)
+                        tiles_map[h3_id]["name1"] = name
+                        # tiles_map[h3_id]["name2"] = name
+                        tiles_map[h3_id]["name2"] = transliterate_name(name)
 
     except Exception as e:
         print(f"Error processing OSM names: {e}")

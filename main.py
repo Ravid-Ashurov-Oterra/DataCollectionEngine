@@ -11,6 +11,10 @@ from csv_export import export_tiles_map_to_csv
 from obtain_tile_dim import process_building_heights_and_assign_width
 from obtain_tile_names import process_osm_names_and_assign_to_tiles
 
+from tile_dynamics_simulator import simulate_tile_dynamics
+import random
+
+
 # Create bounding box Polygon (lng, lat)
 # -----------------------------------------
 polygon = Polygon([
@@ -41,19 +45,24 @@ tile_ids = h3shape_to_cells(latlng_poly, H3_RES)
 tile_count = len(tile_ids)
 print(f"H3 tiles count: {tile_count}")
 # Initialize a hash (dictionary) with each tile_id mapped to an empty object
+
 tiles_map = {tile_id: {
-    'tile_h3_id': tile_id,
-    'tile_center': cell_to_latlng(tile_id),
-    'tile_neighbors': set(grid_ring(tile_id, 1)) - {tile_id},
+    'id': tile_id,
+    'center': list(cell_to_latlng(tile_id)),
+    'neighbors': [neighbor for neighbor in grid_ring(tile_id, 1) if neighbor != tile_id],
     'tile_function': 'na',  
-    'tile_height': None, 
-    'tile_grad_score': 0, 
-    'tile_dynamics': [],  
-    'tile_dimensions': 0.0, 
+    'height': None, 
+    'score1': 0, 
+    'score2': random.choices([0.1, 0.5, 1], weights=[0.99, 0.005, 0.005])[0], 
+    'dynamics': [],  
+    'function_dimensions': 0.0, 
     'hard_height': 0,
-    'tile_name': '',
-    'tile_name_translit': '',
+    'name1': '',
+    'name2': '',
 } for tile_id in tile_ids}
+
+# random Dynamics
+simulate_tile_dynamics(tiles_map)
 
 
 tags_and_functions = [
@@ -63,7 +72,7 @@ tags_and_functions = [
     [schools_tags, 'school'],
     [religion_tags, 'religious'],
     # [amenities_tags, 'amenity'],
-    # [water_tags, 'water'],
+    [water_tags, 'water'],
     [government_tags, 'gov']
 ]
 process_multiple_tags(tags_and_functions, polygon, tile_ids, tiles_map)
@@ -81,4 +90,5 @@ process_building_heights_and_assign_width(polygon, tile_ids, tiles_map)
 calculate_gradient_scores(tiles_map, tile_ids)
 mark_flood_risk_tiles(tiles_map, tile_ids)
 process_osm_names_and_assign_to_tiles(polygon, tile_ids, tiles_map)
+
 export_tiles_map_to_csv(tiles_map)

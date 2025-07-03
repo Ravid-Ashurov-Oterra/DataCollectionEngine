@@ -153,7 +153,7 @@ def process_roads_and_assign_width(polygon, tile_ids, tiles_map, roads_tags):
                         max_width = max(max_width, road['width'])
 
                 if max_width > 0:
-                    tiles_map[h3_id]['tile_dimensions'] = max_width
+                    tiles_map[h3_id]['function_dimensions'] = max_width
 
         print(f"Total tiles with roads: {tiles_with_roads_count}")
 

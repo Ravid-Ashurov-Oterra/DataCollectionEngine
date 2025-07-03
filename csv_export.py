@@ -16,8 +16,8 @@ def export_tiles_map_to_csv(tiles_map, filename_prefix="tiles_map"):
     filename = f"{output_dir}/{filename_prefix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
     
     # Define the fields to export
-    fieldnames = ['tile_h3_id', 'tile_center', 'tile_neighbors', 'tile_height', 
-                  'tile_grad_score', 'tile_function', 'tile_dynamics', 'tile_dimensions', 'tile_name', 'tile_name_translit']
+    fieldnames = ['id', 'center', 'neighbors', 'height', 
+                  'score1', 'score2', 'tile_function', 'dynamics', 'function_dimensions', 'name1', 'name2']
     
     # Write the data to a CSV file
     with open(filename, 'w', newline='') as csvfile:

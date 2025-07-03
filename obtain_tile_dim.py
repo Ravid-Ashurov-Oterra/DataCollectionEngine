@@ -9,7 +9,7 @@ from inputs.osm_tags import *
 
 def process_building_heights_and_assign_width(polygon, tile_ids, tiles_map):
     """
-    Query building heights from OSM and assign the extracted or calculated height to tile_dimensions.
+    Query building heights from OSM and assign the extracted or calculated height to function_dimensions.
 
     Args:
         polygon (Polygon): The bounding polygon for the area of interest.
@@ -17,7 +17,7 @@ def process_building_heights_and_assign_width(polygon, tile_ids, tiles_map):
         tiles_map (dict): The dictionary mapping H3 tile IDs to their properties.
 
     Returns:
-        None: Updates the `tile_dimensions` in `tiles_map` in place.
+        None: Updates the `function_dimensions` in `tiles_map` in place.
     """
 
     print("Fetching building data...")
@@ -36,7 +36,7 @@ def process_building_heights_and_assign_width(polygon, tile_ids, tiles_map):
         buildings_union = unary_union(features)
         buildings_prep = prep(buildings_union)
 
-        # Iterate over H3 tiles and assign building heights to tile_dimensions
+        # Iterate over H3 tiles and assign building heights to function_dimensions
         for h3_id in tile_ids:
             boundary = cell_to_boundary(h3_id)
             boundary_shapely = [(lng, lat) for lat, lng in boundary]
@@ -60,8 +60,8 @@ def process_building_heights_and_assign_width(polygon, tile_ids, tiles_map):
                         print(f"Error processing building feature {idx}: {e}, assigning default height.")
                         building_height = float(levels) * DEFAULT_LEVEL_HEIGHT_M
 
-                # Assign the maximum height to tile_dimensions
-                tiles_map[h3_id]["tile_dimensions"] = building_height
+                # Assign the maximum height to function_dimensions
+                tiles_map[h3_id]["function_dimensions"] = building_height
 
     except Exception as e:
         print(f"Error processing building heights: {e}")

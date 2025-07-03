@@ -18,7 +18,7 @@ def soften_tile_heights(tiles_map, tile_ids, disk_k=2):
         disk_k (int): The strength of the softening, determines the radius of neighbors to consider.
 
     Returns:
-        None: Updates the `tile_height` in `tiles_map` in place.
+        None: Updates the `height` in `tiles_map` in place.
     """
     for h3_id in tile_ids:
         # Skip tiles with tile_function values in the NO_SOFTEN_TILE_FUNCTIONS list
@@ -34,7 +34,7 @@ def soften_tile_heights(tiles_map, tile_ids, disk_k=2):
         # Calculate average height
         if len(neighbors_heights) > 0:
             avg_height = (tiles_map[h3_id]['hard_height'] + sum(neighbors_heights)) / len(neighbors_heights)
-            tiles_map[h3_id]['tile_height'] = avg_height
+            tiles_map[h3_id]['height'] = avg_height
 
 def process_tile_heights(tif_paths_with_functions, tile_ids, tiles_map, softening_disk_k=2):
     """
@@ -47,7 +47,7 @@ def process_tile_heights(tif_paths_with_functions, tile_ids, tiles_map, softenin
         softening_disk_k (int): The strength of the softening, determines the radius of neighbors to consider.
 
     Returns:
-        None: Updates the `tile_height` in `tiles_map` in place.
+        None: Updates the `height` in `tiles_map` in place.
     """
     tiles_height_count = 0
 
@@ -75,15 +75,15 @@ def process_tile_heights(tif_paths_with_functions, tile_ids, tiles_map, softenin
                     g = out_image[1].astype(np.uint32)
                     b = out_image[2].astype(np.uint32)
 
-                    elevation = (0.299* r) + (0.587* g) + (0.114* b)
-                    # elevation = r
+                    # elevation = (0.299* r) + (0.587* g) + (0.114* b)
+                    elevation = r
                     masked = np.ma.masked_equal(elevation, topographic_data.nodata)
 
                     if masked.count() > 0:
                         avg_height = round(float(masked.mean()), 2)
                         # Assign the height to the tile
                         tiles_map[h3_id]['hard_height'] = avg_height
-                        tiles_map[h3_id]['tile_height'] = avg_height
+                        tiles_map[h3_id]['height'] = avg_height
                         tiles_height_count += 1
 
                 except Exception as e:
@@ -109,7 +109,7 @@ def calculate_gradient_scores(tiles_map, tile_ids):
         tile_ids (list): List of H3 tile IDs.
 
     Returns:
-        None: Updates the `tile_grad_score` in `tiles_map` in place.
+        None: Updates the `score1` in `tiles_map` in place.
     """
     max_height_diff = 0
 
@@ -120,23 +120,23 @@ def calculate_gradient_scores(tiles_map, tile_ids):
 
         # Get neighbors' heights
         neighbors_heights = []
-        for neighbor_id in tiles_map[h3_id]['tile_neighbors']:
+        for neighbor_id in tiles_map[h3_id]['neighbors']:
             if (
                 neighbor_id in tiles_map and
                 tiles_map[neighbor_id] is not None and
-                tiles_map[neighbor_id]['tile_height'] is not None and
+                tiles_map[neighbor_id]['height'] is not None and
                 tiles_map[neighbor_id]['tile_function'] not in NO_SOFTEN_TILE_FUNCTIONS
             ):
-                neighbors_heights.append(tiles_map[neighbor_id]['tile_height'])
+                neighbors_heights.append(tiles_map[neighbor_id]['height'])
 
         # Calculate gradient score
         if len(neighbors_heights) > 0:
-            height_diff = abs(tiles_map[h3_id]['tile_height'] - max(neighbors_heights))
+            height_diff = abs(tiles_map[h3_id]['height'] - max(neighbors_heights))
             if height_diff > max_height_diff:
                 max_height_diff = height_diff
-            tiles_map[h3_id]['tile_grad_score'] = height_diff
+            tiles_map[h3_id]['score1'] = height_diff
 
     # Normalize gradient score (values between 0 and 1, based on max height difference)
     for h3_id in tile_ids:
         if max_height_diff > 0:  # Avoid division by zero
-            tiles_map[h3_id]['tile_grad_score'] = round(tiles_map[h3_id]['tile_grad_score'] / max_height_diff, 2)
+            tiles_map[h3_id]['score1'] = round(tiles_map[h3_id]['score1'] / max_height_diff, 2)
